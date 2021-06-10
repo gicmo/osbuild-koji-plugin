@@ -39,19 +39,6 @@ pipeline {
             failFast true
 
             parallel {
-
-                stage('F32') {
-                    agent { label "f32cloudbase && x86_64 && aws" }
-                    environment {
-                        AWS_CREDS = credentials('aws-credentials-osbuildci')
-                    }
-                    steps {
-                        sh "schutzbot/ci_details.sh"
-                        retry(3) {
-                            sh "schutzbot/mockbuild.sh"
-                        }
-                    }
-                }
                 stage('F33') {
                     agent { label "f33cloudbase && x86_64 && aws" }
                     environment {
@@ -82,22 +69,6 @@ pipeline {
 
         stage("Testing 🍌") {
             parallel {
-
-                stage('F32 Integration') {
-                    agent { label "f32cloudbase && x86_64 && aws" }
-                    environment {
-                        TEST_TYPE = "integration"
-                        AWS_CREDS = credentials('aws-credentials-osbuildci')
-                    }
-                    steps {
-                        run_tests('integration')
-                    }
-                    post {
-                        always {
-                            preserve_logs('fedora32-integration')
-                        }
-                    }
-                }
                 stage('F33 Integration') {
                     agent { label "f33cloudbase && x86_64 && aws" }
                     environment {
