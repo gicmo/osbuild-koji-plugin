@@ -92,7 +92,7 @@ Specifically:
  * destination tag, which contains the list of packages
 
 A helper script will create a minimum set that is necessary to build
-an image call `Fedora-Cloud` for `f32-candidate`:
+an image call `Fedora-Cloud` for `f33-candidate`:
 
 ```sh
 test/make-tags.sh
@@ -121,11 +121,11 @@ koji --server=http://localhost:8080/kojihub \
 	 --authtype=password \
 	 osbuild-image \
 	 Fedora-Cloud \
-	 32 \
-	 fedora-32 \
-	 f32-candidate \
+	 33 \
+	 fedora-33 \
+	 f33-candidate \
 	 x86_64 \
-	 --repo 'http://download.fedoraproject.org/pub/fedora/linux/releases/32/Everything/$arch/os/' \
+	 --repo 'http://download.fedoraproject.org/pub/fedora/linux/releases/33/Everything/$arch/os/' \
 	 --image-type qcow2 \
 	 --release 1
 ```
