@@ -51,6 +51,18 @@ pipeline {
                         }
                     }
                 }
+                stage('F34') {
+                        agent { label "f34cloudbase && x86_64 && aws" }
+                        environment {
+                            AWS_CREDS = credentials('aws-credentials-osbuildci')
+                        }
+                        steps {
+                            sh "schutzbot/ci_details.sh"
+                            retry(3) {
+                                sh "schutzbot/mockbuild.sh"
+                            }
+                        }
+                    }
                 stage('EL8') {
                     agent { label "rhel8cloudbase && x86_64 && aws" }
                     environment {
@@ -81,6 +93,21 @@ pipeline {
                     post {
                         always {
                             preserve_logs('fedora33-integration')
+                        }
+                    }
+                }
+                stage('F34 Integration') {
+                    agent { label "f34cloudbase && x86_64 && aws" }
+                    environment {
+                        TEST_TYPE = "integration"
+                        AWS_CREDS = credentials('aws-credentials-osbuildci')
+                    }
+                    steps {
+                        run_tests('integration')
+                    }
+                    post {
+                        always {
+                            preserve_logs('fedora34-integration')
                         }
                     }
                 }
