@@ -8,7 +8,7 @@ import unittest
 import subprocess
 
 
-F32_REPO = "http://download.fedoraproject.org/pub/fedora/linux/releases/32/Everything/$arch/os"
+F33_REPO = "http://download.fedoraproject.org/pub/fedora/linux/releases/33/Everything/$arch/os"
 
 RHEL_REPOS = [
     "http://download.devel.redhat.com/released/RHEL-8/8.2.0/BaseOS/x86_64/os/",
@@ -80,16 +80,16 @@ class TestIntegration(unittest.TestCase):
     @unittest.skipUnless(is_fedora(), "no cross builds")
     def test_compose_fedora(self):
         """Successful Fedora compose"""
-        # Simple test of a successful compose of F32
-        # Needs the f32-candidate tag be setup properly
+        # Simple test of a successful compose of F33
+        # Needs the f33-candidate tag be setup properly
 
         res = self.koji("Fedora-Cloud",
-                        "32",
-                        "fedora-32",
-                        "f32-candidate",
+                        "33",
+                        "fedora-33",
+                        "f33-candidate",
                         "x86_64",
                         "--wait",
-                        repo=F32_REPO)
+                        repo=F33_REPO)
         self.check_res(res)
 
     @unittest.skipUnless(is_rhel(), "no cross builds")
@@ -104,7 +104,7 @@ class TestIntegration(unittest.TestCase):
         res = self.koji("RHEL-Cloud",
                         "8",
                         "rhel-8",
-                        "f32-candidate",
+                        "f33-candidate",
                         "x86_64",
                         "--wait",
                         *repos)
@@ -114,8 +114,8 @@ class TestIntegration(unittest.TestCase):
         """Unknown Tag check"""
         # Check building an unknown tag fails
         res = self.koji("Fedora-Cloud",
-                        "32",
-                        "fedora-32",
+                        "33",
+                        "fedora-33",
                         "UNKNOWNTAG",
                         "x86_64")
         self.check_fail(res)
