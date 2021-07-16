@@ -20,8 +20,8 @@ function retry {
 
 # Variables for where to find osbuild-composer RPMs to test against
 DNF_REPO_BASEURL=http://osbuild-composer-repos.s3-website.us-east-2.amazonaws.com
-OSBUILD_COMMIT=3086c7d70c304214e2855cdcf495d4b70f4b04c6             # release 26
-OSBUILD_COMPOSER_COMMIT=8ca6b1ea157183ff88594ac1b06af1c28d8e0a2c    # release 28
+OSBUILD_COMMIT=bc7096ab8694a1a0abcf7bf536abee8ea8a6e5ac             # release 29
+OSBUILD_COMPOSER_COMMIT=b5c65b687ae599554c1138e02b29cce07ab39f4f    # release 30, TODO: remove gitlab from the url on the next update
 
 # Get OS details.
 source /etc/os-release
@@ -66,7 +66,7 @@ priority=5
 
 [osbuild-composer]
 name=osbuild-composer ${OSBUILD_COMPOSER_COMMIT}
-baseurl=${DNF_REPO_BASEURL}/osbuild-composer/${ID}-${VERSION_ID}/${ARCH}/${OSBUILD_COMPOSER_COMMIT}
+baseurl=${DNF_REPO_BASEURL}/gitlab/osbuild-composer/${ID}-${VERSION_ID}/${ARCH}/${OSBUILD_COMPOSER_COMMIT}
 enabled=1
 gpgcheck=0
 # Default dnf repo priority is 99. Lower number means higher priority.
