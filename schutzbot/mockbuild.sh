@@ -47,7 +47,7 @@ if [[ $ID == rhel ]] && ! rpm -q epel-release; then
 fi
 
 # Register RHEL if we are provided with a registration script.
-if [[ -n "${RHN_REGISTRATION_SCRIPT:-}" ]] && ! sudo subscription-manager status; then
+if [[ $ID == "rhel" && -n "${RHN_REGISTRATION_SCRIPT:-}" ]] && ! sudo subscription-manager status; then
     greenprint "🪙 Registering RHEL instance"
     sudo chmod +x $RHN_REGISTRATION_SCRIPT
     sudo $RHN_REGISTRATION_SCRIPT
