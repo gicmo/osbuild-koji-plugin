@@ -20,8 +20,8 @@ function retry {
 
 # Variables for where to find osbuild-composer RPMs to test against
 DNF_REPO_BASEURL=http://osbuild-composer-repos.s3-website.us-east-2.amazonaws.com
-OSBUILD_COMMIT=3086c7d70c304214e2855cdcf495d4b70f4b04c6             # release 26
-OSBUILD_COMPOSER_COMMIT=8ca6b1ea157183ff88594ac1b06af1c28d8e0a2c    # release 28
+OSBUILD_COMMIT=f8c249cd8f21568b37a03d2a9858a959713028f4             # commit newer than 29, the first one with Fedora 34 RPMs
+OSBUILD_COMPOSER_COMMIT=b5c65b687ae599554c1138e02b29cce07ab39f4f    # release 30, TODO: remove gitlab from the url on the next update
 
 # Get OS details.
 source /etc/os-release
@@ -46,11 +46,19 @@ echo -e "fastestmirror=1" | sudo tee -a /etc/dnf/dnf.conf
 # Add osbuild team ssh keys.
 cat schutzbot/team_ssh_keys.txt | tee -a ~/.ssh/authorized_keys > /dev/null
 
+# Distro version that this script is running on.
+DISTRO_VERSION=${ID}-${VERSION_ID}
+
+if [[ "$ID" == rhel ]]; then
+  # If this script runs on RHEL, install content built using CDN repositories.
+  DISTRO_VERSION=rhel-${VERSION_ID%.*}-cdn
+fi
+
 # Set up dnf repositories with the RPMs we want to test
 sudo tee /etc/yum.repos.d/osbuild.repo << EOF
 [koji-osbuild]
 name=koji-osbuild ${GIT_COMMIT}
-baseurl=${DNF_REPO_BASEURL}/koji-osbuild/${ID}-${VERSION_ID}/${ARCH}/${GIT_COMMIT}
+baseurl=${DNF_REPO_BASEURL}/koji-osbuild/${DISTRO_VERSION}/${ARCH}/${GIT_COMMIT}
 enabled=1
 gpgcheck=0
 # Default dnf repo priority is 99. Lower number means higher priority.
@@ -58,7 +66,7 @@ priority=5
 
 [osbuild]
 name=osbuild ${OSBUILD_COMMIT}
-baseurl=${DNF_REPO_BASEURL}/osbuild/${ID}-${VERSION_ID}/${ARCH}/${OSBUILD_COMMIT}
+baseurl=${DNF_REPO_BASEURL}/osbuild/${DISTRO_VERSION}/${ARCH}/${OSBUILD_COMMIT}
 enabled=1
 gpgcheck=0
 # Default dnf repo priority is 99. Lower number means higher priority.
@@ -66,7 +74,7 @@ priority=5
 
 [osbuild-composer]
 name=osbuild-composer ${OSBUILD_COMPOSER_COMMIT}
-baseurl=${DNF_REPO_BASEURL}/osbuild-composer/${ID}-${VERSION_ID}/${ARCH}/${OSBUILD_COMPOSER_COMMIT}
+baseurl=${DNF_REPO_BASEURL}/gitlab/osbuild-composer/${DISTRO_VERSION}/${ARCH}/${OSBUILD_COMPOSER_COMMIT}
 enabled=1
 gpgcheck=0
 # Default dnf repo priority is 99. Lower number means higher priority.
