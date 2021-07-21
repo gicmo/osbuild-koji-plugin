@@ -1,0 +1,70 @@
+stages:
+  - init
+  - rpmbuild
+  - test
+  - finish
+
+.terraform:
+  after_script:
+    - schutzbot/update_github_status.sh update
+    - schutzbot/run_cloud_cleaner.sh
+  tags:
+    - terraform
+  artifacts:
+    paths:
+      - journal-log
+    when: always
+
+init:
+  stage: init
+  tags:
+    - shell
+  script:
+    - schutzbot/update_github_status.sh start
+
+RPM:
+  stage: rpmbuild
+  extends: .terraform
+  script:
+    - sh "schutzbot/ci_details.sh"
+    - sh "schutzbot/mockbuild.sh"
+  after_script:
+    - schutzbot/update_github_status.sh update
+    - schutzbot/save_journal.sh
+  parallel:
+    matrix:
+      - RUNNER:
+          - aws/fedora-33-x86_64
+          - aws/fedora-33-aarch64
+          - aws/fedora-34-x86_64
+          - aws/fedora-34-aarch64
+          - aws/rhel-8-x86_64
+          - aws/rhel-8-aarch64
+
+Testing:
+  stage: test
+  extends: .terraform
+  script:
+    - sh "schutzbot/ci_details.sh"
+    - sh "schutzbot/deploy.sh"
+    - sh "/usr/libexec/tests/koji-osbuild/integration.sh"
+  after_script:
+    - schutzbot/update_github_status.sh update
+    - schutzbot/save_journal.sh
+  parallel:
+    matrix:
+      - RUNNER:
+          - aws/fedora-33-x86_64
+          # https://quay.io/repository/osbuild/postgres available only for x86_64
+          # - aws/fedora-33-aarch64
+          - aws/fedora-34-x86_64
+          # - aws/fedora-34-aarch64
+          - aws/rhel-8-x86_64
+          # - aws/rhel-8-aarch64
+
+finish:
+  stage: finish
+  tags:
+    - shell
+  script:
+    - schutzbot/update_github_status.sh finish

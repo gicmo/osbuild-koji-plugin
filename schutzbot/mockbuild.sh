@@ -47,7 +47,7 @@ if [[ $ID == rhel ]] && ! rpm -q epel-release; then
 fi
 
 # Register RHEL if we are provided with a registration script.
-if [[ -n "${RHN_REGISTRATION_SCRIPT:-}" ]] && ! sudo subscription-manager status; then
+if [[ $ID == "rhel" && -n "${RHN_REGISTRATION_SCRIPT:-}" ]] && ! sudo subscription-manager status; then
     greenprint "🪙 Registering RHEL instance"
     sudo chmod +x $RHN_REGISTRATION_SCRIPT
     sudo $RHN_REGISTRATION_SCRIPT
@@ -89,5 +89,5 @@ createrepo_c ${REPO_DIR}
 # Upload repository to S3.
 greenprint "☁ Uploading RPMs to S3"
 pushd repo
-    s3cmd --acl-public sync . s3://${REPO_BUCKET}/
+    s3cmd --acl-public put --recursive . s3://${REPO_BUCKET}/
 popd
